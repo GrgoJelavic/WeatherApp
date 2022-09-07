@@ -15,7 +15,7 @@ const Search = () => {
       .then((item) => item.json())
       .then((city) => {
         setCities(city.features.slice(0, 9));
-        // console.log(city.features[0]['place_name']);
+        console.log(city.features[0]['place_name']);
       });
   };
 
@@ -24,6 +24,7 @@ const Search = () => {
       <Header name='Search'></Header>
       <TextInput
         label='Search for a city'
+        style={styles.container}
         onChangeText={(input) => getCities(input)}
         value={{ city }}
         theme={{ colors: { primary: '#00aaff' } }}
@@ -51,6 +52,12 @@ const Search = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    // flex: 1,
+  },
+});
 
 const btnStyle = StyleSheet.create({
   container: {
