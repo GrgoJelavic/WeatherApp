@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, TextInput, Title } from 'react-native-paper';
 import { Image, StyleSheet, View, Text, FlatList } from 'react-native';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
 import Header from './Header';
 import icon from 'react-native-vector-icons/Ionicons';
 
-const Home = () => {
+const Home = (props) => {
   const [data, setData] = useState({
     name: 'fetching city name',
     description: 'fetching weather description',
@@ -19,12 +21,15 @@ const Home = () => {
     fetchWeather();
   }, []);
 
-  const city = 'split';
+  // const city = 'split';
   const appid = '5d1df07e4fe52eeb11ce54e761a61d70';
 
   const fetchWeather = () => {
+    let myCity;
+    const { city } = props.route.params;
+    myCity = city;
     fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${appid}`
+      `https://api.openweathermap.org/data/2.5/weather?q=${myCity}&appid=${appid}`
     )
       .then((data) => data.json())
       .then((result) => {
@@ -43,7 +48,7 @@ const Home = () => {
         });
       });
   };
-
+  if (props.route.params.city !== 'Zagreb') fetchWeather();
   return (
     <>
       <View>
@@ -51,7 +56,9 @@ const Home = () => {
         <Title style={titleStyle.container}>{data.name}</Title>
         <Image
           style={{ width: 200, height: 200 }}
-          source={{ uri: `https://openweathermap.org/img/w/${data.icon}.png` }}
+          source={{
+            uri: `https://openweathermap.org/img/w/${data.icon}.png`,
+          }}
         ></Image>
       </View>
       <Card>
