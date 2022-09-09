@@ -3,10 +3,19 @@ import { Card, Button, TextInput } from 'react-native-paper';
 import { StyleSheet, View, Text, FlatList } from 'react-native';
 import Header from './Header';
 import icon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Search = () => {
+const Search = ({ navigation }) => {
   const [city, setCity] = useState('');
   const [cities, setCities] = useState('');
+  const btnSave = () => {
+    navigation.navigate('home', { city: city });
+  };
+  const listCityClick = (cityName) => {
+    setCity(cityName);
+    navigation.navigate('home', { city: cityName });
+  };
+  let i = 1;
   const getCities = (input) => {
     setCity(input);
     fetch(
@@ -15,7 +24,17 @@ const Search = () => {
       .then((item) => item.json())
       .then((city) => {
         setCities(city.features.slice(0, 9));
-        console.log(city.features[0]['place_name']);
+
+        // city.features.slice(0, 9);
+        // setCities({
+        //   key: Math.random(1),
+        //   value: city.features.slice(0, 9),
+        //   value: city.features[0]['place_name'],
+        // });
+        // console.log(cities.features[0][]);
+        // console.log(city.features[0]);
+        console.log(cities);
+        // console.log(city.features[0]['place_name']);
       });
   };
 
@@ -33,7 +52,11 @@ const Search = () => {
         style={btnStyle.container}
         icon='content-save'
         mode='contained'
-        onPress={() => console.log('Pressed')}
+        onPress={() => {
+          {
+            btnSave();
+          }
+        }}
         theme={{ colors: { primary: '#00aaff' } }}
       >
         <Text style={btnTitleStyle.container}>Save city</Text>
@@ -42,7 +65,12 @@ const Search = () => {
         data={cities}
         renderItem={({ item }) => {
           return (
-            <Card style={cardStyle.container}>
+            <Card
+              style={cardStyle.container}
+              onPress={() => {
+                listCityClick(item.place_name);
+              }}
+            >
               <Text>{item.place_name}</Text>
             </Card>
           );
