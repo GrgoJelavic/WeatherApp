@@ -5,6 +5,9 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import { NavigationContainer } from '@react-navigation/native';
 import Header from './Header';
 import icon from 'react-native-vector-icons/Ionicons';
+import * as Location from 'expo-location';
+import * as Permissions from 'expo-permissions';
+import * as TaskManager from 'expo-task-manager';
 
 const Home = (props) => {
   const [data, setData] = useState({
@@ -16,27 +19,24 @@ const Home = (props) => {
     wind: 'fetching wind speed',
     icon: 'getting weather icon',
   });
-
   useEffect(() => {
     fetchWeather();
   }, []);
-
-  // const city = 'split';
-  const appid = '5d1df07e4fe52eeb11ce54e761a61d70';
+  const appid = 'bab0eced610dc6fe6d14fd460fa5b2de';
 
   const fetchWeather = () => {
     let myCity;
     const { city } = props.route.params;
+    // console.log(`currentFetchWeather: ${currentCity}`);
+    // currentCity === '' ? (myCity = city) : (myCity = currentCity);
     myCity = city;
+    console.log(`myCity : ${myCity}`);
     fetch(
       `https://api.openweathermap.org/data/2.5/weather?q=${myCity}&appid=${appid}`
     )
       .then((data) => data.json())
       .then((result) => {
-        // console.log(result.weather[0].icon);
-        // console.log(result.main.temp);
-        // console.log(result.weather[0].description);
-
+        console.log(result);
         setData({
           name: result.name,
           description: result.weather[0].description,
@@ -46,9 +46,13 @@ const Home = (props) => {
           wind: result.wind.speed,
           icon: result.weather[0].icon,
         });
+      })
+      .catch((err) => {
+        console.error(err);
       });
   };
-  if (props.route.params.city !== 'Zagreb') fetchWeather();
+  if (props.route.params.city !== 'London') fetchWeather();
+
   return (
     <>
       <View>
