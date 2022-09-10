@@ -37,7 +37,7 @@ export default function App() {
           <Tab.Screen
             name='home'
             component={Home}
-            initialParams={{ city: 'Zagreb' }}
+            initialParams={{ city: 'London' }}
           />
           <Tab.Screen name='search' component={Search} />
         </Tab.Navigator>
