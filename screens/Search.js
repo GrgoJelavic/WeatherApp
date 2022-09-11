@@ -6,11 +6,10 @@ import icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import { LogBox } from 'react-native';
-LogBox.ignoreLogs(['Asyncstorage: ...']); // Ignore log notification by message
-LogBox.ignoreAllLogs(); //Ignore all log notifications
+// LogBox.ignoreLogs(['Asyncstorage: ...']);
+// LogBox.ignoreAllLogs();
 
 const Search = ({ navigation }) => {
-  console.log('START');
   const [city, setCity] = useState('');
   const [cities, setCities] = useState('');
   const [location, setLocation] = useState(null);
@@ -50,15 +49,10 @@ const Search = ({ navigation }) => {
       .then((data) => data.json())
       .then((result) => {
         console.log(
-          `resultaT : ${JSON.stringify(
-            result.results[0].address_components[2].long_name
-          )}`
+          `resultaT : ${result.results[0].address_components[2].long_name}`
         );
-        currentCity = JSON.stringify(
-          result.results[0].address_components[2].long_name
-        );
+        currentCity = result.results[0].address_components[2].long_name;
         console.log(`currentCity : ${currentCity}`);
-        // }
       })
       .catch((err) => {
         console.error(err);
@@ -66,7 +60,7 @@ const Search = ({ navigation }) => {
   };
   getCurrentCity();
 
-  let i = 1;
+  // let i = 1;
   const getCities = (input) => {
     setCity(input);
     fetch(
@@ -83,25 +77,80 @@ const Search = ({ navigation }) => {
         console.error(err);
       });
   };
-  const btnSave = () => {
-    console.log(`btnSave: ${city}`);
-    // navigation.navigate('home', { city: city });
+
+  const storeCity = async (city) => {
+    try {
+      if (city.includes(',')) city = city.split(',')[0];
+      await AsyncStorage.setItem(city, city);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const listCityClick = (cityName) => {
+  const storeCurrentCity = async () => {
+    try {
+      await AsyncStorage.setItem(`${currentCity}`, currentCity);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const btnSave = async () => {
+    storeCity(city);
+    navigation.navigate('home', { city: city });
+    console.log(`btnSave: ${city}`);
+    getStoredCity();
+  };
+
+  const listCityClick = async (cityName) => {
+    storeCity(cityName);
     console.log(`cityName: ${cityName}`);
     setCity(cityName);
-    // navigation.navigate('home', { city: cityName });
+    navigation.navigate('home', { city: cityName });
+    getStoredCity();
   };
 
   const btnCurrentLocation = () => {
-    setTimeout(() => {
-      console.log('Delayed for 2 second.');
+    if (currentCity !== '') {
       setCity(currentCity);
+      storeCurrentCity();
       console.log(`BtnCurrentLocation : ${currentCity}`);
-      // navigation.navigate('home', { city: currentCity });
-    }, 2000);
+      navigation.navigate('home', { city: currentCity });
+      getStoredCurrentCity();
+    }
   };
+
+  const getStoredCity = async () => {
+    try {
+      const value = await AsyncStorage.getItem(`${city}`);
+      if (value !== null) {
+        console.log(` STORED CITY ${value}`);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const getStoredCurrentCity = async () => {
+    try {
+      const value = await AsyncStorage.getItem('currentCity');
+      if (value !== null) {
+        // value previously stored
+        console.log(`STORED CURRENT CITY ${value}`);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  clearAllStorage = async () => {
+    try {
+      await AsyncStorage.clear();
+    } catch (err) {
+      console.error(err);
+    }
+    console.log('Storage clear - Done.');
+  };
+  // clearAllStorage();
 
   return (
     <View>
