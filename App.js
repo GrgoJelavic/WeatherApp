@@ -1,9 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, TabBarIOSItem, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Search from './screens/Search';
 import Home from './screens/Home';
 import Cities from './screens/Cities';
-
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -22,11 +21,6 @@ export default function App() {
               route.name === 'search'
                 ? (iconName = 'city')
                 : (iconName = 'home-city-outline');
-
-              // if (route.name === 'home') iconName = 'city';
-              // if (route.name === 'search') iconName = 'home-city-outline';
-              // if (route.name === 'cities') iconName = 'home-city-outline';
-
               return (
                 <MaterialCommunityIcons
                   name={iconName}
@@ -50,7 +44,6 @@ export default function App() {
           <Tab.Screen name='cities' component={Cities} />
         </Tab.Navigator>
       </NavigationContainer>
-      {/* <Home /> */}
     </>
   );
 }

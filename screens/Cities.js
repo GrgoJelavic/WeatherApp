@@ -1,22 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, TextInput } from 'react-native-paper';
+import { Card } from 'react-native-paper';
 import { StyleSheet, View, Text, FlatList } from 'react-native';
 import Header from './Header';
-import icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Location from 'expo-location';
-import { LogBox } from 'react-native';
-LogBox.ignoreLogs(['Asyncstorage: ...']); // Ignore log notification by message
-LogBox.ignoreAllLogs(); //Ignore all log notifications
 
 const Cities = ({ navigation }) => {
   const [allKeys, setGetLocalStorageKeys] = useState([]);
   const [arrayItems, setArrayItems] = useState([]);
-  const [city, setCity] = useState('');
-
-  setTimeout(() => {
-    // console.log('Delayed for 1 second.');
-  }, 1000);
 
   const getLocalStorageKeys = async () => {
     try {
@@ -54,13 +44,9 @@ const Cities = ({ navigation }) => {
     setArrayItems(tempArr);
   }, [allKeys]);
 
-  const listCityClick = async (cityName) => {
-    // storeCity(cityName);
-    console.log(`cityName: ${cityName}`);
-    setCity(cityName);
+  const listCityClick = async (cityName) =>
     navigation.navigate('home', { city: cityName });
-    getStoredCity();
-  };
+
   return (
     <View>
       <Header name='Stored Cities'></Header>
