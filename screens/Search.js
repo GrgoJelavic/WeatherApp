@@ -2,18 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Card, Button, TextInput } from 'react-native-paper';
 import { StyleSheet, View, Text, FlatList } from 'react-native';
 import Header from './Header';
-import icon from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Location from 'expo-location';
 import { LogBox } from 'react-native';
-// LogBox.ignoreLogs(['Asyncstorage: ...']);
-// LogBox.ignoreAllLogs();
+LogBox.ignoreLogs(['Asyncstorage: ...']);
+LogBox.ignoreAllLogs();
 
 const Search = ({ navigation }) => {
   const [city, setCity] = useState('');
   const [cities, setCities] = useState('');
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  let latitude, longitude;
+  let text = 'Fetching..';
 
   useEffect(() => {
     (async () => {
@@ -26,8 +27,7 @@ const Search = ({ navigation }) => {
       setLocation(location);
     })();
   }, []);
-  let latitude, longitude;
-  let text = 'Fetching..';
+
   errorMsg ? (text = 'Fetching..') : (text = JSON.stringify(location));
   if (text !== 'Fetching..') {
     let coordinates = JSON.parse(text);
@@ -36,31 +36,24 @@ const Search = ({ navigation }) => {
       ({ latitude, longitude } = coords);
     }
   }
-  console.log(latitude);
-  console.log(longitude);
 
   const apiKey = 'AIzaSyCWVLxPcXSKI-t0AG-ew6fACGLDi6ZIpQU';
 
   let currentCity = '';
-  const getCurrentCity = async () => {
+  const fetchCurrentCity = async () => {
     await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
     )
       .then((data) => data.json())
       .then((result) => {
-        console.log(
-          `resultaT : ${result.results[0].address_components[2].long_name}`
-        );
         currentCity = result.results[0].address_components[2].long_name;
-        console.log(`currentCity : ${currentCity}`);
       })
       .catch((err) => {
         console.error(err);
       });
   };
-  getCurrentCity();
+  fetchCurrentCity();
 
-  // let i = 1;
   const getCities = (input) => {
     setCity(input);
     fetch(
@@ -69,13 +62,18 @@ const Search = ({ navigation }) => {
       .then((item) => item.json())
       .then((city) => {
         setCities(city.features.slice(0, 5));
-        // console.log(`getCities city :
-        // ${city.features[0]['place_name']}`);
-        // console.log(cities);
       })
       .catch((err) => {
         console.error(err);
       });
+  };
+
+  checkIfCityExists = (input) => {
+    fetch(
+      `https://api.mapbox.com/geocoding/v5/mapbox.places/${input}.json?access_token=pk.eyJ1IjoiZ3Jnb2plIiwiYSI6ImNsN3FsMTRpODA2ZmUzcG5reHNqa3I3dG0ifQ.n8pCPkSY9FlZ0gqqjNqixA&cachebuster=1625641871908&autocomplete=true&types=place`
+    )
+      ? true
+      : false;
   };
 
   const storeCity = async (city) => {
@@ -89,66 +87,61 @@ const Search = ({ navigation }) => {
 
   const storeCurrentCity = async () => {
     try {
-      await AsyncStorage.setItem(`${currentCity}`, currentCity);
+      await AsyncStorage.setItem('currentCity', currentCity);
     } catch (err) {
       console.error(err);
     }
   };
-
   const btnSave = async () => {
-    storeCity(city);
-    navigation.navigate('home', { city: city });
-    console.log(`btnSave: ${city}`);
-    getStoredCity();
+    // (checkIfCityExists(city)) {
+    if (city !== '') {
+      storeCity(city);
+      navigation.navigate('home', { city: city });
+    }
   };
 
   const listCityClick = async (cityName) => {
     storeCity(cityName);
-    console.log(`cityName: ${cityName}`);
     setCity(cityName);
     navigation.navigate('home', { city: cityName });
-    getStoredCity();
   };
 
   const btnCurrentLocation = () => {
-    if (currentCity !== '') {
+    if (currentCity !== '' && currentCity !== 'currentCity') {
       setCity(currentCity);
       storeCurrentCity();
-      console.log(`BtnCurrentLocation : ${currentCity}`);
       navigation.navigate('home', { city: currentCity });
-      getStoredCurrentCity();
     }
   };
+
+  const getStoredCurrentCity = async () => {
+    try {
+      currentCity = await AsyncStorage.getItem('currentCity');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  getStoredCurrentCity();
 
   const getStoredCity = async () => {
     try {
       const value = await AsyncStorage.getItem(`${city}`);
       if (value !== null) {
-        console.log(` STORED CITY ${value}`);
+        console.log(`${value}`);
       }
     } catch (err) {
       console.error(err);
     }
   };
-  const getStoredCurrentCity = async () => {
-    try {
-      const value = await AsyncStorage.getItem('currentCity');
-      if (value !== null) {
-        // value previously stored
-        console.log(`STORED CURRENT CITY ${value}`);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  // getStoredCity;
 
   clearAllStorage = async () => {
     try {
       await AsyncStorage.clear();
+      console.log('Storage clear - Done.');
     } catch (err) {
       console.error(err);
     }
-    console.log('Storage clear - Done.');
   };
   // clearAllStorage();
 
@@ -167,9 +160,7 @@ const Search = ({ navigation }) => {
         icon='content-save'
         mode='contained'
         onPress={() => {
-          {
-            btnSave();
-          }
+          btnSave();
         }}
         theme={{ colors: { primary: '#00aaff' } }}
       >
@@ -180,9 +171,7 @@ const Search = ({ navigation }) => {
         icon='content-save'
         mode='contained'
         onPress={() => {
-          {
-            btnCurrentLocation();
-          }
+          btnCurrentLocation();
         }}
         theme={{ colors: { primary: '#00aaff' } }}
       >
