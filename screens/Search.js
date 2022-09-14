@@ -85,8 +85,9 @@ const Search = ({ navigation }) => {
     }
   };
 
-  const storeCurrentCity = async () => {
+  const storeCurrentCity = async (currentCity) => {
     try {
+      console.log(`AAA  ${currentCity}`);
       await AsyncStorage.setItem('currentCity', currentCity);
     } catch (err) {
       console.error(err);
@@ -107,9 +108,12 @@ const Search = ({ navigation }) => {
   };
 
   const btnCurrentLocation = () => {
-    if (currentCity !== '' && currentCity !== 'currentCity') {
+    if (currentCity) {
+      console.log(`curr ${currentCity}`);
+      // if (currentCity !== 'currentCity') {
       setCity(currentCity);
-      storeCurrentCity();
+      // storeCurrentCity(currentCity);
+      // }
       navigation.navigate('home', { city: currentCity });
     }
   };

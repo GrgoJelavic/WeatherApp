@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Appbar, Title } from 'react-native-paper';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 
 const Header = (props) => {
   return (
