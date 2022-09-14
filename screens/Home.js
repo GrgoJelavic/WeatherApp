@@ -31,7 +31,7 @@ const Home = (props) => {
     if (!myCity) myCity = 'London';
 
     fetch(
-      `https://api.openweathermap.org/data/2.5/weather?q=${myCity}&appid=${appid}`
+      `https://api.openweathermap.org/data/2.5/weather?q=${myCity}&units=metric&appid=${appid}`
     )
       .then((data) => data.json())
       .then((result) => {

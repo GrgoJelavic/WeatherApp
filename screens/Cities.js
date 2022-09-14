@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from 'react-native-paper';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
+import { StyleSheet, View, Text, FlatList, Button } from 'react-native';
 import Header from './Header';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Cities = ({ navigation }) => {
   const [allKeys, setGetLocalStorageKeys] = useState([]);
   const [arrayItems, setArrayItems] = useState([]);
+
+  const deleteCityFromTheStorage = (city) => {
+    try {
+      if (!city) city = '';
+      AsyncStorage.removeItem(city);
+      console.log(`REMOVED ${city}`);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const getLocalStorageKeys = async () => {
     try {
@@ -60,7 +70,18 @@ const Cities = ({ navigation }) => {
                 listCityClick(item);
               }}
             >
-              <Text>{item}</Text>
+              <Text style={txtStyle.container}>
+                {item}
+                <Button
+                  onPress={() => {
+                    deleteCityFromTheStorage(item);
+                  }}
+                  style={btnStyle.container}
+                  title='Delete'
+                  // size={20}
+                  color='red'
+                />
+              </Text>
             </Card>
           );
         }}
@@ -72,15 +93,31 @@ const Cities = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
+    flex: 2,
   },
 });
 
 const cardStyle = StyleSheet.create({
   container: {
-    padding: 16,
-    margin: 4,
+    // flexDirection: 'row',
+    // justifyContent: 'space-betwwen',
+    // alignItems: 'center',
+    // paddingLeft: 100,
+    // paddingRight: 0,
+    // paddingTop: 10,
+    // padding: 50,
   },
+});
+
+const txtStyle = StyleSheet.create({
+  container: {
+    margin: 20,
+    flex: 1,
+  },
+});
+
+const btnStyle = StyleSheet.create({
+  container: {},
 });
 
 export default Cities;
